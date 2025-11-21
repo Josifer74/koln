@@ -19,36 +19,17 @@ export default function useGyroscope() {
         } else {
             setPermissionGranted(true);
         }
-    };
+        useEffect(() => {
+            if (typeof window !== 'undefined' && !('ontouchstart' in window)) {
+                const handleMouseMove = (e: MouseEvent) => {
+                    const x = (e.clientX / window.innerWidth) * 2 - 1;
+                    const y = (e.clientY / window.innerHeight) * 2 - 1;
+                    setOrientation({ x, y });
+                };
+                window.addEventListener('mousemove', handleMouseMove);
+                return () => window.removeEventListener('mousemove', handleMouseMove);
+            }
+        }, []);
 
-    useEffect(() => {
-        if (!permissionGranted) return;
-
-        const handleOrientation = (event: DeviceOrientationEvent) => {
-            // Gamma: Left/Right tilt (-90 to 90)
-            // Beta: Front/Back tilt (-180 to 180)
-            const x = event.gamma ? event.gamma / 90 : 0;
-            const y = event.beta ? (event.beta - 45) / 90 : 0; // Center around 45 degrees tilt
-
-            setOrientation({ x, y });
-        };
-
-        window.addEventListener('deviceorientation', handleOrientation);
-        return () => window.removeEventListener('deviceorientation', handleOrientation);
-    }, [permissionGranted]);
-
-    // Mouse fallback for desktop
-    useEffect(() => {
-        if (typeof window !== 'undefined' && !('ontouchstart' in window)) {
-            const handleMouseMove = (e: MouseEvent) => {
-                const x = (e.clientX / window.innerWidth) * 2 - 1;
-                const y = (e.clientY / window.innerHeight) * 2 - 1;
-                setOrientation({ x, y });
-            };
-            window.addEventListener('mousemove', handleMouseMove);
-            return () => window.removeEventListener('mousemove', handleMouseMove);
-        }
-    }, []);
-
-    return { orientation, requestAccess, permissionGranted };
-}
+        return { orientation, requestAccess, permissionGranted };
+    }
