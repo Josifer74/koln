@@ -1,32 +1,35 @@
 'use client';
 
-import { ARCanvas } from '@react-three/xr';
+import { Canvas } from '@react-three/fiber';
+import { createXRStore, XR } from '@react-three/xr';
 import LionPlacementManager from '../XR/LionPlacementManager';
 
+// Create the XR store outside the component to persist state
+const store = createXRStore();
+
 interface ARSceneProps {
-    cameraEnabled: boolean; // Kept for compatibility, but WebXR handles camera
+    cameraEnabled: boolean;
 }
 
 export default function ARScene({ cameraEnabled }: ARSceneProps) {
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black">
-            {/* AR Canvas handles the WebXR session and camera feed */}
-            <ARCanvas
-                sessionInit={{ requiredFeatures: ['hit-test'] }}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-            >
-                <ambientLight intensity={1} />
-                <pointLight position={[10, 10, 10]} />
+            <Canvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                <XR store={store}>
+                    <ambientLight intensity={1} />
+                    <pointLight position={[10, 10, 10]} />
+                    <LionPlacementManager />
+                </XR>
+            </Canvas>
 
-                <LionPlacementManager />
-            </ARCanvas>
-
-            {/* Note: The Overlay UI needs to trigger the AR session start. 
-                @react-three/xr provides a default button, but we can customize it.
-                However, ARCanvas automatically adds a button if not managed manually.
-                Let's see if we need to adjust Overlay.tsx to hide its own button and let ARCanvas handle it,
-                or use a custom button to start the session.
-            */}
+            <div className="absolute bottom-10 left-0 w-full flex justify-center pointer-events-auto z-50">
+                <button
+                    onClick={() => store.enterAR({ requiredFeatures: ['hit-test'] })}
+                    className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg shadow-lg"
+                >
+                    Enter AR
+                </button>
+            </div>
         </div>
     );
 }
