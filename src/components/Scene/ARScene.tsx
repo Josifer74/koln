@@ -5,7 +5,10 @@ import { createXRStore, XR } from '@react-three/xr';
 import LionPlacementManager from '../XR/LionPlacementManager';
 
 // Create the XR store outside the component to persist state
-const store = createXRStore();
+const store = createXRStore({
+    // @ts-ignore - sessionInit might be the key, or we force it to ensure hit-test is requested
+    sessionInit: { requiredFeatures: ['hit-test'] }
+});
 
 interface ARSceneProps {
     cameraEnabled: boolean;
@@ -24,7 +27,7 @@ export default function ARScene({ cameraEnabled }: ARSceneProps) {
 
             <div className="absolute bottom-10 left-0 w-full flex justify-center pointer-events-auto z-50">
                 <button
-                    onClick={() => store.enterAR({ requiredFeatures: ['hit-test'] })}
+                    onClick={() => store.enterAR()}
                     className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg shadow-lg"
                 >
                     Enter AR
