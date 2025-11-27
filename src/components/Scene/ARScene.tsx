@@ -33,7 +33,7 @@ export default function ARScene({ orientation, cameraEnabled }: ARSceneProps) {
                     autoPlay
                     playsInline
                     muted
-                    className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-50" // Opacity 50 to blend with "future" if needed, or 100 for full AR
+                    className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-100" // Full opacity for AR
                 />
             )}
 

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
-import { Group, AdditiveBlending, DoubleSide } from 'three';
+import { Group, DoubleSide } from 'three';
 
 interface ParallaxLayersProps {
     orientation: { x: number; y: number };
@@ -11,9 +11,8 @@ export default function ParallaxLayers({ orientation }: ParallaxLayersProps) {
     const groupRef = useRef<Group>(null);
 
     // Load textures
-    const bgTexture = useTexture('/assets/layer_back.png');
-    const midTexture = useTexture('/assets/layer_mid.png');
-    const frontTexture = useTexture('/assets/layer_front.png');
+    // Load textures
+    const kiteTexture = useTexture('/assets/kite.png');
 
     useFrame(() => {
         if (groupRef.current) {
@@ -26,38 +25,13 @@ export default function ParallaxLayers({ orientation }: ParallaxLayersProps) {
 
     return (
         <group ref={groupRef}>
-            {/* Background Layer */}
-            <mesh position={[0, 1, -8]}>
-                <planeGeometry args={[16, 10]} />
+            {/* Kite Layer */}
+            <mesh position={[0, 0, -5]}>
+                <planeGeometry args={[5, 5]} /> {/* Adjust size as needed */}
                 <meshBasicMaterial
-                    map={bgTexture}
-                    transparent
-                    opacity={0.6}
-                    blending={AdditiveBlending}
-                    side={DoubleSide}
-                />
-            </mesh>
-
-            {/* Midground Layer */}
-            <mesh position={[0, 0, -4]}>
-                <planeGeometry args={[12, 8]} />
-                <meshBasicMaterial
-                    map={midTexture}
-                    transparent
-                    opacity={0.8}
-                    blending={AdditiveBlending}
-                    side={DoubleSide}
-                />
-            </mesh>
-
-            {/* Foreground Layer */}
-            <mesh position={[0, -2, -1]}>
-                <planeGeometry args={[8, 6]} />
-                <meshBasicMaterial
-                    map={frontTexture}
+                    map={kiteTexture}
                     transparent
                     opacity={1}
-                    blending={AdditiveBlending}
                     side={DoubleSide}
                 />
             </mesh>
