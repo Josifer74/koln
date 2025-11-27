@@ -1,18 +1,5 @@
 'use client';
 
-import { Canvas } from '@react-three/fiber';
-import { createXRStore, XR } from '@react-three/xr';
-import LionPlacementManager from '../XR/LionPlacementManager';
-
-// Create the XR store outside the component to persist state
-const store = createXRStore({
-    // @ts-ignore - sessionInit might be the key, or we force it to ensure hit-test is requested
-    sessionInit: { requiredFeatures: ['hit-test'] }
-});
-
-interface ARSceneProps {
-    cameraEnabled: boolean;
-}
 
 export default function ARScene({ cameraEnabled }: ARSceneProps) {
     return (
