@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function useGyroscope() {
-    const [orientation, setOrientation] = useState({ x: 0, y: 0 });
+    const [orientation, setOrientation] = useState({ x: 0, y: 0, yaw: 0 });
     const [permissionGranted, setPermissionGranted] = useState(false);
+
+    // Refs for continuous tracking to avoid re-binding listeners
+    const lastAlphaRef = useRef<number | null>(null);
+    const cumulativeAlphaRef = useRef<number>(0);
 
     const requestAccess = async () => {
         if (typeof DeviceOrientationEvent !== 'undefined' && (DeviceOrientationEvent as any).requestPermission) {
@@ -25,29 +29,33 @@ export default function useGyroscope() {
         if (!permissionGranted) return;
 
         const handleOrientation = (event: DeviceOrientationEvent) => {
-            // Gamma: Left/Right tilt (-90 to 90)
-            // Beta: Front/Back tilt (-180 to 180)
-            // Alpha: Rotation around Z axis (0 to 360)
+            const gamma = event.gamma || 0; // Tilt Left/Right
+            const beta = event.beta || 0;   // Tilt Front/Back
+            const currentAlpha = event.alpha || 0; // Compass direction
 
-            const gamma = event.gamma || 0;
-            const beta = event.beta || 0;
-            const alpha = event.alpha || 0;
+            // Continuous Alpha Tracking (Fixes 0-360 jump)
+            let deltaAlpha = 0;
+            if (lastAlphaRef.current !== null) {
+                deltaAlpha = currentAlpha - lastAlphaRef.current;
+                // Handle wrap-around
+                if (deltaAlpha > 180) deltaAlpha -= 360;
+                if (deltaAlpha < -180) deltaAlpha += 360;
+            }
+            lastAlphaRef.current = currentAlpha;
+            cumulativeAlphaRef.current += deltaAlpha;
 
-            // Reduce sensitivity by increasing the divisor (was 45)
-            // We use a divisor of 150 for very subtle, smooth movement
+            // Sensitivity for Parallax (Tilt)
             const sensitivity = 150;
 
-            // Combine Gamma (tilt) and Alpha (rotation) for X-axis movement
-            // Note: Alpha 0-360 wrap-around is a known issue for simple implementations, 
-            // but for small movements it works. 
-            // We invert alpha to match natural "looking" direction.
-            const x = (gamma / sensitivity) + (alpha / sensitivity);
-
-            // Y-axis based on Beta (tilt up/down)
-            // Center around 45 degrees (typical holding angle)
+            // X/Y for Parallax (Screen-locked effects like Kite)
+            const x = gamma / sensitivity;
             const y = (beta - 45) / sensitivity;
 
-            setOrientation({ x, y });
+            // Yaw for World Locking (Lion)
+            // Convert degrees to radians for Three.js
+            const yaw = (cumulativeAlphaRef.current * Math.PI) / 180;
+
+            setOrientation({ x, y, yaw });
         };
 
         window.addEventListener('deviceorientation', handleOrientation);
@@ -59,7 +67,9 @@ export default function useGyroscope() {
             const handleMouseMove = (e: MouseEvent) => {
                 const x = (e.clientX / window.innerWidth) * 2 - 1;
                 const y = (e.clientY / window.innerHeight) * 2 - 1;
-                setOrientation({ x, y });
+                // Simulate yaw with mouse X for testing
+                const yaw = x * Math.PI;
+                setOrientation({ x, y, yaw });
             };
             window.addEventListener('mousemove', handleMouseMove);
             return () => window.removeEventListener('mousemove', handleMouseMove);
