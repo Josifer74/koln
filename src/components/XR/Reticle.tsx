@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
+import { Mesh, Matrix4 } from 'three';
 
 interface ReticleProps {
     visible: boolean;
-    matrix: THREE.Matrix4;
+    matrix: Matrix4;
 }
 
 export default function Reticle({ visible, matrix }: ReticleProps) {
