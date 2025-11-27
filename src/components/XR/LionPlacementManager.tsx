@@ -23,7 +23,8 @@ export default function LionPlacementManager() {
 
         if (!hitTestSourceRequested.current) {
             session.requestReferenceSpace('viewer').then((referenceSpace: any) => {
-                session.requestHitTestSource({ space: referenceSpace }).then((source: any) => {
+                // @ts-ignore - requestHitTestSource is experimental and missing from default types
+                (session as any).requestHitTestSource({ space: referenceSpace }).then((source: any) => {
                     hitTestSource.current = source;
                 });
             });
