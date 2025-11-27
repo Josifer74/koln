@@ -24,11 +24,19 @@ export default function ParallaxLayers({ orientation, activeAsset, anchorOffset 
                 // We rotate the group opposite to the camera yaw to keep it stable in the world
                 // Then we add the anchorOffset to place it where the user clicked
                 const yaw = orientation.yaw || 0;
+                // We rotate the LION mesh itself, not the group, to avoid messing up other potential layers if we had them.
+                // But here we only show one asset at a time.
+                // Rotating the group is fine.
                 groupRef.current.rotation.y = -yaw + anchorOffset;
-                groupRef.current.rotation.x = orientation.y * 0.5; // Slight tilt allowed
+                groupRef.current.rotation.x = orientation.y * 0.5;
+            } else if (activeAsset === 'station') {
+                // Station Logic
+                // We want it to be huge and surrounding
+                // Less movement for background feel
+                groupRef.current.rotation.y = orientation.x * 0.2;
+                groupRef.current.rotation.x = orientation.y * 0.1;
             } else {
-                // Screen Locking Logic (Parallax)
-                // Invert X for "window" effect
+                // Kite Logic (Screen Locked / Parallax)
                 groupRef.current.rotation.y = orientation.x;
                 groupRef.current.rotation.x = orientation.y;
             }
@@ -50,12 +58,13 @@ export default function ParallaxLayers({ orientation, activeAsset, anchorOffset 
             )}
 
             {activeAsset === 'station' && (
-                <mesh position={[0, 0, -8]}>
-                    <planeGeometry args={[16, 9]} />
+                <mesh position={[0, 0, -10]}>
+                    {/* Huge scale to fill screen */}
+                    <planeGeometry args={[40, 25]} />
                     <meshBasicMaterial
                         map={stationTexture}
                         transparent
-                        opacity={0.9}
+                        opacity={0.5} // Lower opacity to let person show through better
                         blending={AdditiveBlending}
                         side={DoubleSide}
                     />
@@ -63,9 +72,9 @@ export default function ParallaxLayers({ orientation, activeAsset, anchorOffset 
             )}
 
             {activeAsset === 'lion' && (
-                <mesh position={[0, -1, -6]}>
+                <mesh position={[0, -2, -6]}>
                     {/* Lion standing on the ground */}
-                    <planeGeometry args={[6, 6]} />
+                    <planeGeometry args={[7, 7]} />
                     <meshBasicMaterial
                         map={lionTexture}
                         transparent
