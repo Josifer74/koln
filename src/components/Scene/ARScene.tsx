@@ -13,6 +13,7 @@ const store = createXRStore({
     depthSensing: false,
     planeDetection: false, // We rely on hit-test
     meshDetection: false, // Explicitly disable to avoid "Unrecognized feature" error
+    layers: false, // Explicitly disable layers as it causes "Unsupported feature" error on some devices
 });
 
 interface ARSceneProps {
