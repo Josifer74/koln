@@ -1,5 +1,24 @@
 'use client';
 
+import { Canvas } from '@react-three/fiber';
+import { createXRStore, XR } from '@react-three/xr';
+import LionPlacementManager from '../XR/LionPlacementManager';
+
+// Create the XR store with native v6 options
+const store = createXRStore({
+    hitTest: true,
+    anchors: true,
+    domOverlay: true,
+    hand: false, // Disable hand tracking to avoid unsupported requirements
+    depthSensing: false,
+    planeDetection: false, // We rely on hit-test
+    meshDetection: false, // Explicitly disable to avoid "Unrecognized feature" error
+});
+
+interface ARSceneProps {
+    cameraEnabled: boolean;
+}
+
 export default function ARScene({ cameraEnabled }: ARSceneProps) {
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black">
