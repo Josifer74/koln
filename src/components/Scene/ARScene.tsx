@@ -1,6 +1,5 @@
 'use client';
 
-
 export default function ARScene({ cameraEnabled }: ARSceneProps) {
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black">
